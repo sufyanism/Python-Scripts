@@ -59,11 +59,13 @@ st.markdown("""
     }
 
     /* 3. Main Content Padding */
-    .main .block-container {
-        padding-top: 100px; /* Space to clear the header */
-        padding-bottom: 60px; /* Space to clear the footer */
-    }
+   .st-emotion-cache-zy6yx3 {
+    /* width: 100%; */
+    padding: 6rem 4rem;
+    max-width: initial;
+    min-width: auto;
 
+            
     /* 4. Custom Sticky Footer */
     .footer-container {
         position: fixed;
@@ -79,7 +81,31 @@ st.markdown("""
         z-index: 1000001;
     }
 
+    /* --- Desktop / General Styles (Already in your code) --- */
+.block-container {
+    padding-top: 100px; /* Space to clear the header */
+}
+
+/* --- Mobile Specific Styles (Applied when screen is <= 768px) --- */
+@media (max-width: 768px) {
+    /* Targeting the main content container specifically for mobile */
+    [data-testid="stAppViewBlockContainer"] {
+        padding: 6rem 1rem !important; /* Reduced side padding for small screens */
+        max-width: initial !important;
+        min-width: auto !important;
+        width: 100% !important;
+    }
+
+    .block-container {
+        padding-top: 80px !important; /* Slightly less space on mobile headers */
+    }
     
+    /* Optional: Adjust sidebar for mobile if needed */
+    [data-testid="stSidebar"] {
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
