@@ -8,14 +8,45 @@ from datetime import datetime
 from PyPDF2 import PdfReader
 from pathlib import Path
 
-# --- Constants & Configuration ---
-st.set_page_config(page_title="Academic Forensic Hub", layout="wide")
+# --- 1. Constants & Configuration ---
+st.set_page_config(page_title="Academic Forensic Hub", layout="wide", initial_sidebar_state="expanded")
+
+# --- 2. Custom CSS for Sidebar Motion ---
+st.markdown("""
+<style>
+    /* Targeting the Sidebar for smooth motion */
+    [data-testid="stSidebar"] {
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Adds a subtle fade-in effect to sidebar contents */
+    [data-testid="stSidebarNav"] {
+        animation: fadeIn 1s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Optional: Hover effect to make sidebar stand out when moving */
+    [data-testid="stSidebar"]:hover {
+        box-shadow: 5px 0px 15px rgba(0,0,0,0.1);
+    }
+    
+    /* Smooth transition for the main content area to follow sidebar */
+    .main {
+        transition: margin-left 0.5s ease-in-out;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 CURRENT_YEAR = datetime.now().year
 TIME_OUT = 5
 MAX_URLS = 100
 url_regex = re.compile(r'https?://[^\s"<>()]+', re.IGNORECASE)
 
-# --- Shared Functions ---
+# --- 3. Shared Functions ---
 def extract_text_from_pdf(uploaded_file):
     reader = PdfReader(uploaded_file)
     text = ""
@@ -25,12 +56,14 @@ def extract_text_from_pdf(uploaded_file):
             text += page_text + "\n"
     return text.strip()
 
-# --- State Management ---
+# --- 4. State Management ---
 if 'active_task' not in st.session_state:
     st.session_state.active_task = "Staleness"
 
-# --- Sidebar Navigation ---
+# --- 5. Sidebar Navigation (The Trigger) ---
 st.sidebar.title("🛠️ Navigation")
+# Note: In Streamlit, clicking these buttons will trigger the script re-run, 
+# and the CSS above ensures the transition is smooth.
 if st.sidebar.button("📘 Syllabus Staleness", use_container_width=True):
     st.session_state.active_task = "Staleness"
 if st.sidebar.button("🎯 Verifiability Score", use_container_width=True):
@@ -38,7 +71,7 @@ if st.sidebar.button("🎯 Verifiability Score", use_container_width=True):
 if st.sidebar.button("🔍 URL Reference Check", use_container_width=True):
     st.session_state.active_task = "URL"
 
-# --- Main Logic ---
+# --- 6. Main Logic ---
 
 # 1. SYLLABUS STALENESS SCANNER
 if st.session_state.active_task == "Staleness":
