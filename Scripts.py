@@ -7,46 +7,122 @@ import requests
 from datetime import datetime
 from PyPDF2 import PdfReader
 from pathlib import Path
+import base64
+
 
 # --- 1. Constants & Configuration ---
-st.set_page_config(page_title="Academic Forensic Hub", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Zeba Academy", layout="wide", initial_sidebar_state="expanded")
 
-# --- 2. Custom CSS for Sidebar Motion ---
+# --- 2. Enhanced CSS (Sidebar + Header + Footer) ---
 st.markdown("""
 <style>
-    /* Targeting the Sidebar for smooth motion */
-    [data-testid="stSidebar"] {
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    /* Hide default Streamlit elements to make room for custom ones */
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    div[data-testid="stDecoration"] {display: none;}
 
-    /* Adds a subtle fade-in effect to sidebar contents */
-    [data-testid="stSidebarNav"] {
-        animation: fadeIn 1s;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    /* Optional: Hover effect to make sidebar stand out when moving */
-    [data-testid="stSidebar"]:hover {
-        box-shadow: 5px 0px 15px rgba(0,0,0,0.1);
+    /* 1. Custom Sticky Header */
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 2rem;
+        background-color: #ffffff;
+        border-bottom: 2px solid #f0f2f6;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000001; /* Above sidebar */
+        height: 70px;
     }
     
-    /* Smooth transition for the main content area to follow sidebar */
-    .main {
-        transition: margin-left 0.5s ease-in-out;
+    .logo-text {
+        font-size: 24px;
+        font-weight: bold;
+        color: #0e1117;
+        font-family: 'Helvetica Neue', sans-serif;
     }
+
+    img{
+            height: 80px;
+            width: 80px;
+        }
+
+    /* 2. Sidebar Dimensions & Positioning */
+    [data-testid="stSidebar"] {
+        width: 350px !important;
+        min-width: 350px !important;
+        max-width: 350px !important;
+        top: 70px !important; /* Start below the header */
+    }
+
+    /* 3. Main Content Padding */
+    .main .block-container {
+        padding-top: 100px; /* Space to clear the header */
+        padding-bottom: 60px; /* Space to clear the footer */
+    }
+
+    /* 4. Custom Sticky Footer */
+    .footer-container {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #f8f9fa;
+        color: #31333F;
+        text-align: center;
+        padding: 10px 0;
+        font-weight: 500;
+        border-top: 1px solid #dee2e6;
+        z-index: 1000001;
+    }
+
+    
 </style>
 """, unsafe_allow_html=True)
 
+# --- 3. Header, Logo & Footer Implementation ---
+
+# Function to convert image to base64
+def get_base64_image(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        return None
+
+# Path to your image
+img_path = "./Logo.png"
+img_base64 = get_base64_image(img_path)
+
+if img_base64:
+    # Render the markdown with the Base64 string
+    st.markdown(f"""
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #ddd;">
+            <div class="logo-text" style="font-size: 24px; font-weight: bold;">Zeba Academy</div>
+            <div style="display: flex;">
+                <img src="data:image/png;base64,{img_base64}" />
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.error("Image file not found. Please check the path.")
+
+# Render Footer
+st.markdown("""
+    <div class="footer-container">
+        © 2026 Zeba Academy | Empowering Academic Integrity
+    </div>
+""", unsafe_allow_html=True)
+
+# --- 4. Logic & State Management ---
 CURRENT_YEAR = datetime.now().year
 TIME_OUT = 5
 MAX_URLS = 100
 url_regex = re.compile(r'https?://[^\s"<>()]+', re.IGNORECASE)
 
-# --- 3. Shared Functions ---
 def extract_text_from_pdf(uploaded_file):
     reader = PdfReader(uploaded_file)
     text = ""
@@ -56,14 +132,12 @@ def extract_text_from_pdf(uploaded_file):
             text += page_text + "\n"
     return text.strip()
 
-# --- 4. State Management ---
 if 'active_task' not in st.session_state:
     st.session_state.active_task = "Staleness"
 
-# --- 5. Sidebar Navigation (The Trigger) ---
+# --- 5. Sidebar Navigation ---
 st.sidebar.title("🛠️ Navigation")
-# Note: In Streamlit, clicking these buttons will trigger the script re-run, 
-# and the CSS above ensures the transition is smooth.
+
 if st.sidebar.button("📘 Syllabus Staleness", use_container_width=True):
     st.session_state.active_task = "Staleness"
 if st.sidebar.button("🎯 Verifiability Score", use_container_width=True):
@@ -71,7 +145,7 @@ if st.sidebar.button("🎯 Verifiability Score", use_container_width=True):
 if st.sidebar.button("🔍 URL Reference Check", use_container_width=True):
     st.session_state.active_task = "URL"
 
-# --- 6. Main Logic ---
+# --- 6. Main Logic Modules ---
 
 # 1. SYLLABUS STALENESS SCANNER
 if st.session_state.active_task == "Staleness":
@@ -95,14 +169,12 @@ if st.session_state.active_task == "Staleness":
                 percent_old = round((len([y for y in years if y < (CURRENT_YEAR - 10)]) / len(years)) * 100)
                 score = max(0, min(100, round(100 - (percent_old * 0.7))))
                 
-                res = {"oldest_year": oldest, "median_year": median, "percent_old": percent_old, "score": score}
-                
                 c1, c2, c3, c4 = st.columns(4)
                 c1.metric("Oldest", oldest)
                 c2.metric("Median", median)
                 c3.metric("% Old", f"{percent_old}%")
                 c4.metric("Score", score)
-                st.json(res)
+                st.json({"oldest_year": oldest, "median_year": median, "percent_old": percent_old, "score": score})
 
 # 2. LEARNING OUTCOME VERIFIABILITY
 elif st.session_state.active_task == "Verifiability":
