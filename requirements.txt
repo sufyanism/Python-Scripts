@@ -1,2 +1,8 @@
-six
+streamlit>=1.24.0
+pandas
+requests
 PyPDF2
+python-docx
+textract
+six
+altair<5
