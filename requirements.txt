@@ -1,8 +1,8 @@
-streamlit>=1.24.0
+streamlit
 pandas
 requests
 PyPDF2
 python-docx
 textract
-six.moves
-altair<5
+six
+altair
