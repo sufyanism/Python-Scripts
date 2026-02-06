@@ -1,2 +1,5 @@
-streamlit
+six
 PyPDF2
+python-docx
+pandas
+requests
