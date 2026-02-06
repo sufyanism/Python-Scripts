@@ -1,7 +1,14 @@
-streamlit
-pandas
-requests
 PyPDF2
 python-docx
-textract
-six
+pandas
+requests
+streamlit
+pandas 
+ re
+ json
+time
+requests
+datetime
+PdfReader
+Path
+base64
