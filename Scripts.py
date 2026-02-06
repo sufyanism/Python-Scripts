@@ -17,6 +17,7 @@ import textract
 st.set_page_config(page_title="Zeba Academy", layout="wide", initial_sidebar_state="collapsed")
 
 # ------------------ 2. Custom CSS ------------------
+# ------------------ 2. Custom CSS (Adaptive Mode) ------------------
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
@@ -24,15 +25,15 @@ st.markdown("""
     footer {visibility: hidden;}
     div[data-testid="stDecoration"] {display: none;}
 
-    /* Hide Sidebar entirely since we use top buttons */
-    [data-testid="stSidebar"] {display: none;}
-
+    /* Top Navigation Bar */
     .header-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px 2rem;
-        border-bottom: 2px solid #f0f2f6;
+        /* Uses Streamlit's secondary background color (adaptive) */
+        background-color: var(--secondary-background-color);
+        border-bottom: 2px solid var(--border-color);
         position: fixed;
         top: 0;
         left: 0;
@@ -44,33 +45,43 @@ st.markdown("""
     .logo-text {
         font-size: 24px;
         font-weight: bold;
-        color: #0e1117;
+        /* Automatically switches between black/white text */
+        color: var(--text-color);
     }
 
     .block-container {
         padding-top: 100px;
     }
 
+    /* Footer Adaptive Styling */
     .footer-container {
         position: fixed;
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: #f8f9fa;
-        color: #31333F;
+        background-color: var(--secondary-background-color);
+        color: var(--text-color);
         text-align: center;
         padding: 8px 0;
         font-weight: 500;
-        border-top: 1px solid #dee2e6;
+        border-top: 1px solid var(--border-color);
         z-index: 1000001;
     }
     
-    /* Style for the active/inactive buttons */
+    /* Button Adaptive Styling */
     .stButton button {
         width: 100%;
         border-radius: 5px;
         height: 3em;
-        background-color: #f0f2f6;
+        background-color: var(--secondary-background-color);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Hover effect for buttons */
+    .stButton button:hover {
+        border-color: #ff4b4b; /* Streamlit Red accent */
+        color: #ff4b4b;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -247,4 +258,3 @@ elif st.session_state.active_task == "URL":
         df = pd.DataFrame(results)
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Summary:** {len(df[df['category'] == 'OK'])} OK, {len(df[df['category'] == 'DEAD'])} DEAD, {len(df[df['category'] == 'UNREACHABLE'])} UNREACHABLE")
-
