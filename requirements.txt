@@ -5,3 +5,12 @@ PyPDF2
 python-docx
 textract
 altair<5
+
+
+
+
+PyPDF2
+python-docx
+pandas
+requests
+streamlit
