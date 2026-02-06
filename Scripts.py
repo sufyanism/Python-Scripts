@@ -32,7 +32,6 @@ st.markdown("""
         justify-content: space-between;
         align-items: center;
         padding: 10px 2rem;
-        background-color: #ffffff;
         border-bottom: 2px solid #f0f2f6;
         position: fixed;
         top: 0;
@@ -248,3 +247,4 @@ elif st.session_state.active_task == "URL":
         df = pd.DataFrame(results)
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Summary:** {len(df[df['category'] == 'OK'])} OK, {len(df[df['category'] == 'DEAD'])} DEAD, {len(df[df['category'] == 'UNREACHABLE'])} UNREACHABLE")
+
