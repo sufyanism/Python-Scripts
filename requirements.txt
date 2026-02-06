@@ -3,12 +3,3 @@ python-docx
 pandas
 requests
 streamlit
-pandas 
- re
- json
-time
-requests
-datetime
-PdfReader
-Path
-base64
