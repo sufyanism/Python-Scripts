@@ -138,8 +138,10 @@ st.markdown("---")
 # ------------------ 6. Helper Functions ------------------
 def extract_text_from_file(uploaded_file):
     filename = uploaded_file.name.lower()
+
     if filename.endswith(".txt"):
         return uploaded_file.read().decode("utf-8", errors="ignore")
+
     elif filename.endswith(".pdf"):
         reader = PdfReader(uploaded_file)
         text = ""
@@ -148,18 +150,14 @@ def extract_text_from_file(uploaded_file):
             if page_text:
                 text += page_text + "\n"
         return text.strip()
+
     elif filename.endswith(".docx"):
         doc = Document(uploaded_file)
         return "\n".join([p.text for p in doc.paragraphs])
+
     elif filename.endswith(".doc"):
-        temp_path = f"temp_{int(time.time())}.doc"
-        with open(temp_path, "wb") as f:
-            f.write(uploaded_file.read())
-        try:
-            text = textract.process(temp_path).decode("utf-8", errors="ignore")
-        finally:
-            Path(temp_path).unlink(missing_ok=True)
-        return text
+        return "Legacy .doc files are not supported on cloud hosting. Please upload a .docx file."
+
     return ""
 
 CURRENT_YEAR = datetime.now().year
@@ -257,4 +255,5 @@ elif st.session_state.active_task == "URL":
         df = pd.DataFrame(results)
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Summary:** {len(df[df['category'] == 'OK'])} OK, {len(df[df['category'] == 'DEAD'])} DEAD, {len(df[df['category'] == 'UNREACHABLE'])} UNREACHABLE")
+
 
