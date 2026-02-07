@@ -9,8 +9,6 @@ from PyPDF2 import PdfReader
 from pathlib import Path
 import base64
 from docx import Document
-import textract
-
 
 # ------------------ 1. Configuration ------------------
 st.set_page_config(page_title="Zeba Academy", layout="wide", initial_sidebar_state="collapsed")
@@ -255,5 +253,6 @@ elif st.session_state.active_task == "URL":
         df = pd.DataFrame(results)
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Summary:** {len(df[df['category'] == 'OK'])} OK, {len(df[df['category'] == 'DEAD'])} DEAD, {len(df[df['category'] == 'UNREACHABLE'])} UNREACHABLE")
+
 
 
