@@ -14,7 +14,6 @@ from docx import Document
 st.set_page_config(page_title="Zeba Academy", layout="wide", initial_sidebar_state="collapsed")
 
 # ------------------ 2. Custom CSS ------------------
-# ------------------ 2. Custom CSS (Adaptive Mode) ------------------
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
@@ -22,13 +21,11 @@ st.markdown("""
     footer {visibility: hidden;}
     div[data-testid="stDecoration"] {display: none;}
 
-    /* Top Navigation Bar */
     .header-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px 2rem;
-        /* Uses Streamlit's secondary background color (adaptive) */
         background-color: var(--secondary-background-color);
         border-bottom: 2px solid var(--border-color);
         position: fixed;
@@ -42,7 +39,6 @@ st.markdown("""
     .logo-text {
         font-size: 24px;
         font-weight: bold;
-        /* Automatically switches between black/white text */
         color: var(--text-color);
     }
 
@@ -50,7 +46,6 @@ st.markdown("""
         padding-top: 100px;
     }
 
-    /* Footer Adaptive Styling */
     .footer-container {
         position: fixed;
         left: 0;
@@ -64,8 +59,7 @@ st.markdown("""
         border-top: 1px solid var(--border-color);
         z-index: 1000001;
     }
-    
-    /* Button Adaptive Styling */
+
     .stButton button {
         width: 100%;
         border-radius: 5px;
@@ -75,9 +69,8 @@ st.markdown("""
         border: 1px solid var(--border-color);
     }
 
-    /* Hover effect for buttons */
     .stButton button:hover {
-        border-color: #ff4b4b; /* Streamlit Red accent */
+        border-color: #ff4b4b;
         color: #ff4b4b;
     }
 </style>
@@ -112,8 +105,7 @@ st.markdown("""
 if "active_task" not in st.session_state:
     st.session_state.active_task = "Staleness"
 
-# ------------------ 5. Top Navigation Buttons ------------------
-# This replaces the sidebar
+# ------------------ 5. Top Navigation ------------------
 nav_col1, nav_col2, nav_col3 = st.columns(3)
 
 with nav_col1:
@@ -165,10 +157,9 @@ url_regex = re.compile(r'https?://[^\s"<>()]+', re.IGNORECASE)
 
 # ------------------ 7. Modules ------------------
 
-# 📘 STALENESS
 if st.session_state.active_task == "Staleness":
     st.header("📘 Syllabus Staleness Scanner")
-    file = st.file_uploader("Upload (.pdf, .docx, .doc, .txt)", type=["pdf", "docx", "doc", "txt"])
+    file = st.file_uploader("Upload (.pdf, .docx, .txt)", type=["pdf", "docx", "txt"])
 
     if file and st.button("Run Staleness Scan 🔍"):
         text = extract_text_from_file(file)
@@ -189,12 +180,9 @@ if st.session_state.active_task == "Staleness":
             c3.metric("% Old", f"{percent_old}%")
             c4.metric("Score", score)
 
-# 🎯 VERIFIABILITY
 elif st.session_state.active_task == "Verifiability":
     st.header("🎯 Learning Outcome Verifiability")
-    st.write("Extracts measurable outcomes and ignores administrative text.")
-    
-    file = st.file_uploader("Upload outcomes document", type=["docx", "doc", "txt"])
+    file = st.file_uploader("Upload outcomes document", type=["docx", "txt"])
 
     WEAK = {"understand", "know", "appreciate", "learn", "familiarize", "study"}
     MEDIUM = {"explain", "analyze", "apply", "describe", "identify", "demonstrate"}
@@ -209,9 +197,11 @@ elif st.session_state.active_task == "Verifiability":
 
         for line in raw_lines:
             line = line.strip()
-            if not line: continue
+            if not line:
+                continue
             clean_line = re.sub(r"^(Outcome|LO)?\s*[\d\.\)\-\*•]+\s*:?", "", line, flags=re.IGNORECASE).strip()
-            if not clean_line: continue
+            if not clean_line:
+                continue
             words = clean_line.split()
             first_word = words[0].lower() if words else ""
             if first_word in ALL_VERBS:
@@ -229,10 +219,9 @@ elif st.session_state.active_task == "Verifiability":
             for outcome in filtered_outcomes:
                 st.markdown(f"* {outcome}")
 
-# 🔍 URL CHECKER
 elif st.session_state.active_task == "URL":
     st.header("🔍 Reference URL Checker")
-    file = st.file_uploader("Upload (.pdf, .docx, .doc, .txt)", type=["pdf", "docx", "doc", "txt"])
+    file = st.file_uploader("Upload (.pdf, .docx, .txt)", type=["pdf", "docx", "txt"])
 
     if file and st.button("Start URL Check"):
         text = extract_text_from_file(file)
@@ -246,6 +235,7 @@ elif st.session_state.active_task == "URL":
                 status = r.status_code
             except:
                 status = None
+
             cat = "OK" if status and 200 <= status <= 299 else "DEAD" if status in [404, 410] else "UNREACHABLE"
             results.append({"url": url, "status": status, "category": cat})
             progress.progress((i + 1) / len(urls))
@@ -253,6 +243,3 @@ elif st.session_state.active_task == "URL":
         df = pd.DataFrame(results)
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Summary:** {len(df[df['category'] == 'OK'])} OK, {len(df[df['category'] == 'DEAD'])} DEAD, {len(df[df['category'] == 'UNREACHABLE'])} UNREACHABLE")
-
-
-
